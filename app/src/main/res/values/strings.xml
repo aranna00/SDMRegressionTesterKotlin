@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SDMRegressionTester</string>
+    <string name="title_incoming">Incoming</string>
+    <string name="title_regression">Regression</string>
+</resources>
