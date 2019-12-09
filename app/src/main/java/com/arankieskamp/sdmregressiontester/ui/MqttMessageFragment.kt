@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.arankieskamp.sdmregressiontester.R
-import com.arankieskamp.sdmregressiontester.models.RegressionMessage
+import com.arankieskamp.sdmregressiontester.models.MqttInput
 
 /**
  * A fragment representing a list of Items.
@@ -50,7 +50,7 @@ class MqttMessageFragment : Fragment() {
                     else -> GridLayoutManager(context, columnCount)
                 }
                 adapter = MyMqttMessageRecyclerViewAdapter(
-                    RegressionMessage.ITEMS,
+                    MqttInput.ITEMS,
                     listener
                 )
             }
@@ -85,7 +85,7 @@ class MqttMessageFragment : Fragment() {
      */
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onMqttMessageListFragmentInteraction(regressionProblem: RegressionMessage.RegressionProblem?)
+        fun onMqttMessageListFragmentInteraction(regressionProblem: MqttInput.MqttMessage?)
     }
 
     fun updateListView() {

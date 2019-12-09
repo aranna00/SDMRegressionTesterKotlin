@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.arankieskamp.sdmregressiontester.R
-import com.arankieskamp.sdmregressiontester.models.RegressionMessage
+import com.arankieskamp.sdmregressiontester.models.MqttInput
 import com.arankieskamp.sdmregressiontester.ui.MqttMessageFragment.OnListFragmentInteractionListener
 import kotlinx.android.synthetic.main.fragment_mqttmessage.view.*
 
@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_mqttmessage.view.*
  * TODO: Replace the implementation with code for your data type.
  */
 class MyMqttMessageRecyclerViewAdapter(
-    private val mValues: List<RegressionMessage.RegressionProblem>,
+    private val mValues: List<MqttInput.MqttMessage>,
     private val mListener: OnListFragmentInteractionListener?
 ) : RecyclerView.Adapter<MyMqttMessageRecyclerViewAdapter.ViewHolder>() {
 
@@ -25,7 +25,7 @@ class MyMqttMessageRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as RegressionMessage.RegressionProblem?
+            val item = v.tag as MqttInput.MqttMessage?
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
             mListener?.onMqttMessageListFragmentInteraction(item)

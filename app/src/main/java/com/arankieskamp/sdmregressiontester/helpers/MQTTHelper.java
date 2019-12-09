@@ -9,32 +9,13 @@ import com.hivemq.client.mqtt.mqtt5.message.subscribe.suback.Mqtt5SubAck;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-
-public class MQTTHelper {
-    public static Observable observable;
-    private static MQTTHelper instance;
+public abstract class MQTTHelper {
     final String clientId = "Group-23-RegressionTester";
     private Mqtt5AsyncClient mqttClient;
     private List<Mqtt5Publish> messages = new ArrayList<>();
 
     private String hostname;
     private int port;
-
-    public static MQTTHelper getInstance() {
-        if (instance == null) {
-            createInstance();
-        }
-
-        return instance;
-    }
-
-    private synchronized static void createInstance() {
-        if (instance == null) {
-            instance = new MQTTHelper();
-        }
-    }
 
     public void init(String hostname, int port) {
         if (!hostname.equals(this.hostname) || port != this.port || mqttClient == null) {
@@ -52,41 +33,34 @@ public class MQTTHelper {
                     .buildAsync();
             connect();
         }
-        observable = Observable.create((ObservableOnSubscribe) emitter -> {
-            try {
-                emitter.onNext(messages.get(0));
-            } catch (Exception e) {
-                emitter.onError(e);
-            }
-        });
     }
 
     private void connect() {
         mqttClient.connectWith()
-                .sessionExpiryInterval(1800)
+                .cleanStart(true)
+                .sessionExpiryInterval(0)
+                .noKeepAlive()
                 .simpleAuth()
                 .username("")
                 .applySimpleAuth()
                 .send()
-                .whenCompleteAsync(this::ConnectionCompleted);
+                .whenCompleteAsync(this::connectionCompleted);
     }
 
     public void subscribeToTopic(String subscriptionTopic) {
         mqttClient.subscribeWith()
                 .topicFilter(subscriptionTopic)
-                .callback(this::MessageRecieved)
+                .callback(this::messageReceived)
                 .send()
-                .whenCompleteAsync(this::SubscriptionComplete);
+                .whenCompleteAsync(this::subscriptionComplete);
     }
 
 
-    public void MessageRecieved(Mqtt5Publish publish) {
+    public void messageReceived(Mqtt5Publish publish) {
         messages.add(publish);
     }
 
-    public void SubscriptionComplete(Mqtt5SubAck subAck, Throwable throwable) {
-    }
+    public abstract void subscriptionComplete(Mqtt5SubAck subAck, Throwable throwable);
 
-    public void ConnectionCompleted(Mqtt5ConnAck connAck, Throwable throwable) {
-    }
+    public abstract void connectionCompleted(Mqtt5ConnAck connAck, Throwable throwable);
 }
