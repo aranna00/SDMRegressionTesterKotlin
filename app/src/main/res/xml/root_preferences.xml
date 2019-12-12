@@ -27,6 +27,17 @@
             app:title="@string/sdm_group_number"
             app:useSimpleSummaryProvider="true" />
 
+        <SwitchPreference
+            app:defaultValue="true"
+            app:key="MQTTAutoScroll"
+            app:title="Auto scroll to latest publish" />
+
+
+        <SwitchPreference
+            app:defaultValue="false"
+            app:key="regressionAutoScroll"
+            app:title="Auto scroll to latest regression problem" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -17,7 +17,16 @@ object RegressionMessage {
         payload: String,
         exception: String?
     ): RegressionProblem {
-        return RegressionProblem(ITEMS.size.toString(), topic, payload, exception)
+        return createRegressionProblem(ITEMS.size.toString(), topic, payload, exception)
+    }
+
+    fun createRegressionProblem(
+        messageNum: String,
+        topic: String,
+        payload: String,
+        exception: String?
+    ): RegressionProblem {
+        return RegressionProblem(messageNum, topic, payload, exception)
     }
 
     class RegressionProblem(

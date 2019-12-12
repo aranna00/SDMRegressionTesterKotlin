@@ -33,24 +33,29 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
 
     private var mqttHelper: MQTTHelper = object : MQTTHelper() {
         override fun messageReceived(publish: Mqtt5Publish) {
-            MqttInput.addItem(
-                MqttInput.createMqttMessage(
-                    publish.topic.toString(),
-                    publish.payloadAsBytes.toString(Charsets.UTF_8)
-                )
+            val newMessage = MqttInput.createMqttMessage(
+                publish.topic.toString(),
+                publish.payloadAsBytes.toString(Charsets.UTF_8)
             )
+            MqttInput.addItem(newMessage)
+            if (currentFragment is MqttMessageFragment) {
+                (currentFragment as MqttMessageFragment).updateListView()
+            }
             try {
                 RegressionTester.CheckMqttMessage(publish)
             } catch (e: RegressionTester.TopicStructureException) {
                 RegressionMessage.addItem(
                     RegressionMessage.createRegressionProblem(
+                        newMessage.id,
                         publish.topic.toString(),
                         publish.payloadAsBytes.toString(Charsets.UTF_8),
                         e.message
                     )
                 )
+                if (currentFragment is RegressionMessageFragment) {
+                    (currentFragment as RegressionMessageFragment).updateListView()
+                }
             }
-            updateCurrentFragment()
         }
 
         override fun subscriptionComplete(
@@ -97,14 +102,6 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
 
     fun setCurrentFragment(fragment: Fragment) {
         currentFragment = fragment
-    }
-
-    private fun updateCurrentFragment() {
-        if (currentFragment is MqttMessageFragment) {
-            (currentFragment as MqttMessageFragment).updateListView()
-        } else if (currentFragment is RegressionMessageFragment) {
-            (currentFragment as RegressionMessageFragment).updateListView()
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

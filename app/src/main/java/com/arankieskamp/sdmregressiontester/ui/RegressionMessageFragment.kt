@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,8 +42,13 @@ class RegressionMessageFragment : Fragment() {
         val refresh = Handler(Looper.getMainLooper())
         refresh.post {
             messageAdapter!!.notifyDataSetChanged()
-//            listView!!.scrollToPosition(messageAdapter!!.itemCount - 1)
 
+            val sharedPref = PreferenceManager.getDefaultSharedPreferences(activity)
+            val autoScroll = sharedPref.getBoolean("regressionAutoScroll", false)
+
+            if (autoScroll) {
+                listView!!.scrollToPosition(messageAdapter!!.itemCount - 1)
+            }
         }
     }
 

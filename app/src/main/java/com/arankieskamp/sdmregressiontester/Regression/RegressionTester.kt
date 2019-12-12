@@ -32,18 +32,26 @@ object RegressionTester {
 
         checkFifthTopicLevel(levels[4], laneType, direction, componentType)
 
-        checkPayload(message.payload.get().int, laneType, componentType)
+        val payloadByteArray = message.payloadAsBytes
+        checkPayload(payloadByteArray.toString(Charsets.UTF_8).toInt(), componentType)
     }
 
     private fun checkPayload(
         payload: Int,
-        laneType: LaneTypes,
         componentType: ComponentTypes
     ) {
-        if (payload in 0..3) {
-
-        } else {
-            throw TopicStructureException("Payload outside spec", null)
+        when (componentType) {
+            ComponentTypes.traffic_light -> if (payload !in 0..3) {
+                throw TopicStructureException("Payload outside spec", null)
+            }
+            ComponentTypes.warning_light,
+            ComponentTypes.sensor,
+            ComponentTypes.barrier,
+            ComponentTypes.deck,
+            ComponentTypes.boat_light,
+            ComponentTypes.train_light -> if (payload !in 0..2) {
+                throw TopicStructureException("Payload outside spec", null)
+            }
         }
     }
 
@@ -87,12 +95,11 @@ object RegressionTester {
 
                 if (
                     (componentType == ComponentTypes.warning_light ||
-                            componentType == ComponentTypes.barrier ||
-                            componentType == ComponentTypes.traffic_light) &&
-                    (laneType == LaneTypes.track || laneType == LaneTypes.vessel)
+                            componentType == ComponentTypes.barrier) &&
+                    (laneType != LaneTypes.track && laneType != LaneTypes.vessel)
                 ) {
                     throw TopicStructureException(
-                        componentType.name + " component used in" + laneType.name,
+                        componentType.name + " component used in " + laneType.name,
                         null
                     )
                 }
