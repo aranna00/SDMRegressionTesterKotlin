@@ -1,10 +1,13 @@
 package com.arankieskamp.sdmregressiontester
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -12,6 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.arankieskamp.sdmregressiontester.Regression.RegressionTester
 import com.arankieskamp.sdmregressiontester.helpers.MQTTHelper
 import com.arankieskamp.sdmregressiontester.models.MqttInput
@@ -27,36 +31,26 @@ import com.hivemq.client.mqtt.mqtt5.message.subscribe.suback.Mqtt5SubAck
 class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInteractionListener,
     RegressionMessageFragment.OnListFragmentInteractionListener {
 
-    override fun onRegressionTesterListFragmentInteraction(item: RegressionMessage.RegressionProblem?) {
-
-    }
-
-    override fun onMqttMessageListFragmentInteraction(regressionProblem: MqttInput.MqttMessage?) {
-
-    }
-
-
-    internal var mqttHelper: MQTTHelper = object : MQTTHelper() {
+    private var mqttHelper: MQTTHelper = object : MQTTHelper() {
         override fun messageReceived(publish: Mqtt5Publish) {
             MqttInput.addItem(
                 MqttInput.createMqttMessage(
                     publish.topic.toString(),
-                    publish.payload.toString()
+                    publish.payloadAsBytes.toString(Charsets.UTF_8)
                 )
             )
-            updateMqttListView()
             try {
                 RegressionTester.CheckMqttMessage(publish)
             } catch (e: RegressionTester.TopicStructureException) {
                 RegressionMessage.addItem(
                     RegressionMessage.createRegressionProblem(
                         publish.topic.toString(),
-                        publish.payload.toString(),
+                        publish.payloadAsBytes.toString(Charsets.UTF_8),
                         e.message
                     )
                 )
-                updateRegressionListView()
             }
+            updateCurrentFragment()
         }
 
         override fun subscriptionComplete(
@@ -74,24 +68,43 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
             subscribeToSelectedTopics()
         }
     }
+    private var currentFragment: Fragment? = null
 
-    override fun onAttachFragment(fragment: Fragment) {
-        super.onAttachFragment(fragment)
-        createToast(fragment.javaClass.name)
+    override fun onRegressionTesterListFragmentInteraction(item: RegressionMessage.RegressionProblem?) {
+
     }
 
-    private fun updateMqttListView() {
-        TODO("Update correct fragment listview")
-//        if (mqttFragment.isVisible) {
-//            mqttFragment.updateListView()
-//        }
+    override fun onMqttMessageListFragmentInteraction(mqttMessage: MqttInput.MqttMessage?) {
+
     }
 
-    private fun updateRegressionListView() {
-        TODO("Update correct fragment listview")
-//        if (regressionFragment.isVisible) {
-//            regressionFragment.updateListView()
-//        }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.top_nav_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        if (id == R.id.nav_settings_btn) {
+            startActivity(Intent(this, SettingsActivity::class.java))
+            return true
+        }
+
+        return false
+    }
+
+    fun setCurrentFragment(fragment: Fragment) {
+        currentFragment = fragment
+    }
+
+    private fun updateCurrentFragment() {
+        if (currentFragment is MqttMessageFragment) {
+            (currentFragment as MqttMessageFragment).updateListView()
+        } else if (currentFragment is RegressionMessageFragment) {
+            (currentFragment as RegressionMessageFragment).updateListView()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,15 +113,18 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
         val navController = findNavController(R.id.nav_host_fragment)
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard
+                R.id.navigation_regression, R.id.navigation_regression
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+
         startMqtt()
     }
 
@@ -132,14 +148,17 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
 
         mqttHelper.init(hostname, port)
 
-        val test = Thread(Runnable {
-            Thread.sleep(5000)
+        Thread(Runnable {
+            Thread.sleep(2500)
             subscribeToSelectedTopics()
         }).start()
     }
 
     private fun subscribeToSelectedTopics() {
-        mqttHelper.subscribeToTopic("23/#")
-        createToast("Subscription successful")
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+        val groupNumber = sharedPref.getString("GroupNumber", "23")
+        mqttHelper.clearSubscribtions()
+        mqttHelper.subscribeToTopic("$groupNumber/#")
+//        createToast("Subscription successful")
     }
 }

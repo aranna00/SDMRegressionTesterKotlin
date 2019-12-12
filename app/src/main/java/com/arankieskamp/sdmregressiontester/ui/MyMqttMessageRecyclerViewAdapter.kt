@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arankieskamp.sdmregressiontester.R
 import com.arankieskamp.sdmregressiontester.models.MqttInput
 import com.arankieskamp.sdmregressiontester.ui.MqttMessageFragment.OnListFragmentInteractionListener
-import kotlinx.android.synthetic.main.fragment_mqttmessage.view.*
+import kotlinx.android.synthetic.main.fragment_mqtt_message.view.*
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
@@ -34,14 +34,15 @@ class MyMqttMessageRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_mqttmessage, parent, false)
+            .inflate(R.layout.fragment_mqtt_message, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
         holder.mIdView.text = item.id
-        holder.mContentView.text = item.payload
+        holder.mPayloadView.text = item.payload
+        holder.mTopicView.text = item.topic
 
         with(holder.mView) {
             tag = item
@@ -53,10 +54,11 @@ class MyMqttMessageRecyclerViewAdapter(
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mIdView: TextView = mView.item_number
-        val mContentView: TextView = mView.payload
+        val mPayloadView: TextView = mView.payload
+        val mTopicView: TextView = mView.topic
 
         override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
+            return super.toString() + " '" + mPayloadView.text + "'"
         }
     }
 }

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.arankieskamp.sdmregressiontester.MainActivity
 import com.arankieskamp.sdmregressiontester.R
 import com.arankieskamp.sdmregressiontester.models.RegressionMessage
 
@@ -26,7 +27,7 @@ class RegressionMessageFragment : Fragment() {
 
     private var listener: OnListFragmentInteractionListener? = null
     private var messageAdapter: MyRegressionMessageRecyclerViewAdapter? = null
-    internal var listView: RecyclerView? = null
+    internal var listView: RecyclerView.LayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +41,8 @@ class RegressionMessageFragment : Fragment() {
         val refresh = Handler(Looper.getMainLooper())
         refresh.post {
             messageAdapter!!.notifyDataSetChanged()
-            listView!!.scrollToPosition(messageAdapter!!.itemCount - 1)
+//            listView!!.scrollToPosition(messageAdapter!!.itemCount - 1)
+
         }
     }
 
@@ -62,9 +64,17 @@ class RegressionMessageFragment : Fragment() {
                         RegressionMessage.ITEMS,
                         listener
                     )
+
+                listView = layoutManager
+                messageAdapter = adapter as MyRegressionMessageRecyclerViewAdapter
             }
         }
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivity).setCurrentFragment(this)
     }
 
     override fun onAttach(context: Context) {

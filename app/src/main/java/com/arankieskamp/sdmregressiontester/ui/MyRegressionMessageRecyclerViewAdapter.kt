@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.arankieskamp.sdmregressiontester.R
 import com.arankieskamp.sdmregressiontester.models.RegressionMessage
 import com.arankieskamp.sdmregressiontester.ui.RegressionMessageFragment.OnListFragmentInteractionListener
-import kotlinx.android.synthetic.main.fragment_regressionmessage.view.*
+import kotlinx.android.synthetic.main.fragment_regression_message.view.*
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
@@ -34,7 +34,7 @@ class MyRegressionMessageRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_regressionmessage, parent, false)
+            .inflate(R.layout.fragment_regression_message, parent, false)
         return ViewHolder(view)
     }
 
@@ -42,6 +42,8 @@ class MyRegressionMessageRecyclerViewAdapter(
         val item = mValues[position]
         holder.mIdView.text = item.id
         holder.mContentView.text = item.payload
+        holder.mTopicView.text = item.topic
+        holder.mExceptionView.text = item.exception
 
         with(holder.mView) {
             tag = item
@@ -54,6 +56,8 @@ class MyRegressionMessageRecyclerViewAdapter(
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mIdView: TextView = mView.item_number
         val mContentView: TextView = mView.payload
+        val mTopicView: TextView = mView.topic
+        val mExceptionView: TextView = mView.exception
 
         override fun toString(): String {
             return super.toString() + " '" + mContentView.text + "'"

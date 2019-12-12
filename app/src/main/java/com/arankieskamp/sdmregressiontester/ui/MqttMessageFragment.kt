@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.arankieskamp.sdmregressiontester.MainActivity
 import com.arankieskamp.sdmregressiontester.R
 import com.arankieskamp.sdmregressiontester.models.MqttInput
 
@@ -26,13 +27,21 @@ class MqttMessageFragment : Fragment() {
 
     private var listener: OnListFragmentInteractionListener? = null
     private var messageAdapter: MyMqttMessageRecyclerViewAdapter? = null
-    internal var listView: RecyclerView? = null
+    internal var listView: RecyclerView.LayoutManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
+        }
+    }
+
+    fun updateListView() {
+        val refresh = Handler(Looper.getMainLooper())
+        refresh.post {
+            messageAdapter!!.notifyDataSetChanged()
+            listView!!.scrollToPosition(messageAdapter!!.itemCount - 1)
         }
     }
 
@@ -53,9 +62,17 @@ class MqttMessageFragment : Fragment() {
                     MqttInput.ITEMS,
                     listener
                 )
+
+                listView = layoutManager
+                messageAdapter = adapter as MyMqttMessageRecyclerViewAdapter
             }
         }
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivity).setCurrentFragment(this)
     }
 
     override fun onAttach(context: Context) {
@@ -85,15 +102,7 @@ class MqttMessageFragment : Fragment() {
      */
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onMqttMessageListFragmentInteraction(regressionProblem: MqttInput.MqttMessage?)
-    }
-
-    fun updateListView() {
-        val refresh = Handler(Looper.getMainLooper())
-        refresh.post {
-            messageAdapter!!.notifyDataSetChanged()
-            listView!!.scrollToPosition(messageAdapter!!.itemCount - 1)
-        }
+        fun onMqttMessageListFragmentInteraction(mqttMessage: MqttInput.MqttMessage?)
     }
 
     companion object {

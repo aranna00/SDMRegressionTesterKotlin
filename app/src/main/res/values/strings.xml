@@ -2,4 +2,9 @@
     <string name="app_name">SDMRegressionTester</string>
     <string name="title_incoming">Incoming</string>
     <string name="title_regression">Regression</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">SDM Settings</string>
+    <string name="sdm_group_number">Group number</string>
 </resources>
