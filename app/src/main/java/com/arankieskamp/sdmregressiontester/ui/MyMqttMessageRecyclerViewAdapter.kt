@@ -40,6 +40,12 @@ class MyMqttMessageRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
+        if (item.success) {
+
+            holder.mIdView.setBackgroundResource(R.color.colorSuccess)
+        } else {
+            holder.mIdView.setBackgroundResource(R.color.colorFail)
+        }
         holder.mIdView.text = item.id
         holder.mPayloadView.text = item.payload
         holder.mTopicView.text = item.topic

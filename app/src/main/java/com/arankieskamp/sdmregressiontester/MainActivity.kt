@@ -37,13 +37,10 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
                 publish.topic.toString(),
                 publish.payloadAsBytes.toString(Charsets.UTF_8)
             )
-            MqttInput.addItem(newMessage)
-            if (currentFragment is MqttMessageFragment) {
-                (currentFragment as MqttMessageFragment).updateListView()
-            }
             try {
                 RegressionTester.CheckMqttMessage(publish)
             } catch (e: RegressionTester.TopicStructureException) {
+                newMessage.success = false
                 RegressionMessage.addItem(
                     RegressionMessage.createRegressionProblem(
                         newMessage.id,
@@ -55,6 +52,10 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
                 if (currentFragment is RegressionMessageFragment) {
                     (currentFragment as RegressionMessageFragment).updateListView()
                 }
+            }
+            MqttInput.addItem(newMessage)
+            if (currentFragment is MqttMessageFragment) {
+                (currentFragment as MqttMessageFragment).updateListView()
             }
         }
 

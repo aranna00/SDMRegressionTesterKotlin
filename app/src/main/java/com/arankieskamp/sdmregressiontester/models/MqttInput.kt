@@ -13,8 +13,8 @@ object MqttInput {
     }
 
     fun createMqttMessage(topic: String, payload: String): MqttMessage {
-        return MqttMessage(ITEMS.size.toString(), topic, payload)
+        return MqttMessage(ITEMS.size.toString(), topic, payload, true)
     }
 
-    class MqttMessage(val id: String, val topic: String, val payload: String)
+    class MqttMessage(val id: String, val topic: String, val payload: String, var success: Boolean)
 }
