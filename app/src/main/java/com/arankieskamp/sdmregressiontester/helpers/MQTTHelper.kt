@@ -34,6 +34,11 @@ abstract class MQTTHelper {
         }
     }
 
+    fun disconnect() {
+        mqttClient!!.disconnectWith()
+            .send()
+    }
+
     fun clearSubscribtions() {
         for (topic in topicSubscriptions) {
             mqttClient!!.unsubscribeWith()

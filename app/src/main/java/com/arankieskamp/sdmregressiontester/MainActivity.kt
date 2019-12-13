@@ -1,11 +1,9 @@
 package com.arankieskamp.sdmregressiontester
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -96,6 +94,16 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
         if (id == R.id.nav_settings_btn) {
             startActivity(Intent(this, SettingsActivity::class.java))
             return true
+        } else if (id == R.id.nav_refresh_btn) {
+            MqttInput.clearMessages()
+            RegressionMessage.clearMessages()
+
+            if (currentFragment is RegressionMessageFragment) {
+                (currentFragment as RegressionMessageFragment).updateListView()
+            } else if (currentFragment is MqttMessageFragment) {
+                (currentFragment as MqttMessageFragment).updateListView()
+            }
+            return true
         }
 
         return false
@@ -126,6 +134,16 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
         startMqtt()
     }
 
+    override fun onPause() {
+        super.onPause()
+        mqttHelper.disconnect()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startMqtt()
+    }
+
     private fun createToast(message: String) {
         createToast(message, Toast.LENGTH_SHORT)
     }
@@ -136,27 +154,19 @@ class MainActivity : AppCompatActivity(), MqttMessageFragment.OnListFragmentInte
     }
 
     private fun startMqtt() {
-        val prefs = getSharedPreferences("pref_mqtt", Context.MODE_PRIVATE)
-        val hostname = prefs.getString("hostname_text", "arankieskamp.com")
-        val port = prefs.getInt("port_int", 1883)
+        mqttHelper.init("arankieskamp.com", 1883)
 
-        Log.w("Info", hostname!!)
-        Log.w("Info", port.toString() + "")
-
-
-        mqttHelper.init(hostname, port)
-
-        Thread(Runnable {
-            Thread.sleep(2500)
-            subscribeToSelectedTopics()
-        }).start()
+        subscribeToSelectedTopics()
     }
 
     private fun subscribeToSelectedTopics() {
-        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        val groupNumber = sharedPref.getString("GroupNumber", "23")
-        mqttHelper.clearSubscribtions()
-        mqttHelper.subscribeToTopic("$groupNumber/#")
+        Thread(Runnable {
+            Thread.sleep(2500)
+            val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+            val groupNumber = sharedPref.getString("GroupNumber", "23")
+            mqttHelper.clearSubscribtions()
+            mqttHelper.subscribeToTopic("$groupNumber/#")
 //        createToast("Subscription successful")
+        }).start()
     }
 }

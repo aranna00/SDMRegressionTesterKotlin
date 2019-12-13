@@ -1,6 +1,7 @@
 package com.arankieskamp.sdmregressiontester.models
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 object MqttInput {
     val ITEMS: MutableList<MqttMessage> = ArrayList()
@@ -14,6 +15,10 @@ object MqttInput {
 
     fun createMqttMessage(topic: String, payload: String): MqttMessage {
         return MqttMessage(ITEMS.size.toString(), topic, payload, true)
+    }
+
+    fun clearMessages() {
+        ITEMS.clear()
     }
 
     class MqttMessage(val id: String, val topic: String, val payload: String, var success: Boolean)

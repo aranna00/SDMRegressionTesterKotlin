@@ -20,6 +20,10 @@ object RegressionMessage {
         return createRegressionProblem(ITEMS.size.toString(), topic, payload, exception)
     }
 
+    fun clearMessages() {
+        MqttInput.ITEMS.clear()
+    }
+
     fun createRegressionProblem(
         messageNum: String,
         topic: String,
